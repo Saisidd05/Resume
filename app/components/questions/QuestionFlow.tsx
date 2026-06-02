@@ -21,6 +21,7 @@ export default function QuestionFlow() {
 
   // Calculate overall form completion progress (starts at 0% and increases as they type)
   const getOverallProgress = (): number => {
+    if (!questionFlow) return 0;
     let totalRequired = 0;
     let totalFilledRequired = 0;
 
@@ -53,8 +54,6 @@ export default function QuestionFlow() {
     return Math.round((totalFilledRequired / totalRequired) * 100);
   };
 
-  const overallProgress = getOverallProgress();
-
   if (!questionFlow || questionFlow.cards.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-8">
@@ -64,6 +63,8 @@ export default function QuestionFlow() {
       </div>
     );
   }
+
+  const overallProgress = getOverallProgress();
 
   const totalSections = questionFlow.cards.length;
   const currentCard = questionFlow.cards[currentSectionIndex];
