@@ -283,6 +283,7 @@ export const STATIC_QUESTION_FLOW: QuestionFlow = {
             'Mentoring',
             'Decision Making',
             'Customer Focus',
+            'Others',
           ],
           constraints: {
             raw_text: 'Min 3, Max 10 soft skills',
