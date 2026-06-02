@@ -4,7 +4,7 @@
   "private": true,
   "description": "Template-preserving resume builder — TEMPLATE IN = TEMPLATE OUT",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 5743",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

@@ -3,97 +3,77 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import {
-  Upload, Brain, MessageSquare, Wand2,
-  FileCheck, Download, Lock, Eye, Sparkles
+  MessageSquare,
+  Wand2,
+  Eye,
+  Printer,
+  FileCode,
+  Sparkles,
+  FileCheck
 } from 'lucide-react';
 
 const features = [
   {
-    icon: Upload,
-    title: 'Upload Your Template',
+    icon: MessageSquare,
+    title: 'Guided Questions',
     description:
-      'Drop any PDF or DOCX resume template. We parse its exact structure — sections, fonts, spacing, every detail.',
+      'Fill in your details step-by-step across 8 comprehensive sections designed for maximum visual alignment.',
     color: '#FFC107',
     delay: 0,
   },
   {
-    icon: Brain,
-    title: 'Template Intelligence',
+    icon: Wand2,
+    title: 'Smart Repeaters',
     description:
-      'Our engine reads written instructions inside your template ("3–4 lines", "5 bullet points") and enforces them during generation.',
+      'Dynamically add and manage repeatable blocks for Professional Experience, Projects, Education, and Awards.',
     color: '#FF8F00',
     delay: 0.1,
-  },
-  {
-    icon: MessageSquare,
-    title: 'Smart Question Flow',
-    description:
-      'Dynamically generated questions based on YOUR specific template sections — not generic forms.',
-    color: '#FF6F00',
-    delay: 0.2,
-  },
-  {
-    icon: Wand2,
-    title: 'AI Content Assist',
-    description:
-      'Generate, improve, shorten, or rewrite content using AI. Entirely optional — works fully offline too.',
-    color: '#E53935',
-    delay: 0.3,
   },
   {
     icon: Eye,
     title: 'Live Preview',
     description:
-      'See your resume update in real time as you type. The preview renders with your template\'s exact formatting.',
+      'Watch your resume render in real time on a beautifully structured, standard Calibri/Arial template card.',
+    color: '#FF6F00',
+    delay: 0.2,
+  },
+  {
+    icon: Printer,
+    title: 'Print directly to PDF',
+    description:
+      'Instantly print or save your resume as a clean, high-resolution vector PDF using standard browser print options.',
+    color: '#E53935',
+    delay: 0.3,
+  },
+  {
+    icon: FileCode,
+    title: 'Export Standalone HTML',
+    description:
+      'Download a single, fully responsive HTML file with nested styles to host online or run locally.',
     color: '#C62828',
     delay: 0.4,
   },
   {
-    icon: Lock,
-    title: 'Strict Template Mode',
-    description:
-      'Layout, colors, fonts, section order — all locked. Nothing changes except the content you provide.',
-    color: '#B71C1C',
-    delay: 0.5,
-  },
-  {
-    icon: FileCheck,
-    title: 'Pixel-Perfect Output',
-    description:
-      'Generated PDF is visually identical to your uploaded template. Same fonts, same layout, same you.',
-    color: '#FFC107',
-    delay: 0.6,
-  },
-  {
-    icon: Download,
-    title: 'PDF & DOCX Export',
-    description:
-      'Download in your preferred format. Open it — it looks exactly like your template, now filled with your story.',
-    color: '#FFD54F',
-    delay: 0.7,
-  },
-  {
     icon: Sparkles,
-    title: 'Fully Local-First',
+    title: '100% Offline & Private',
     description:
-      'No account, no cloud, no tracking. Everything lives in your browser. Your data never leaves your machine.',
+      'No backend, no accounts, and no data tracking. Your resume details stay locally in your browser storage.',
     color: '#FF5722',
-    delay: 0.8,
+    delay: 0.5,
   },
 ];
 
 const steps = [
-  { number: '01', title: 'Upload Template', desc: 'Your PDF or DOCX resume template' },
-  { number: '02', title: 'Answer Questions', desc: 'Section-specific targeted questions' },
-  { number: '03', title: 'Generate Resume', desc: 'Template filled with your answers' },
-  { number: '04', title: 'Download', desc: 'Pixel-perfect PDF or DOCX output' },
+  { number: '01', title: 'Answer Questions', desc: 'Fill in sections with repeatable blocks' },
+  { number: '02', title: 'Live Preview', desc: 'Watch your layout update instantly' },
+  { number: '03', title: 'Print & Export', desc: 'Download as HTML or save as PDF' },
 ];
 
 export default function FeatureCards() {
   const featRef = useRef(null);
   const stepsRef = useRef(null);
-  const featInView = useInView(featRef, { once: true, margin: '-100px' });
-  const stepsInView = useInView(stepsRef, { once: true, margin: '-100px' });
+  const featInView = useInView(featRef, { once: false, margin: '-100px' });
+  const stepsInView = useInView(stepsRef, { once: false, margin: '-100px' });
 
   return (
     <>
@@ -124,7 +104,7 @@ export default function FeatureCards() {
               <span className="gradient-text">Nothing you don't.</span>
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '1.05rem', maxWidth: '520px', margin: '0 auto' }}>
-              Built for professionals who have a great template and just need it filled correctly.
+              Built for professionals who need a clean, standard resume formatted instantly.
             </p>
           </motion.div>
 
@@ -192,12 +172,12 @@ export default function FeatureCards() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Four steps.{' '}
+              Three steps.{' '}
               <span className="gradient-text">One perfect resume.</span>
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {steps.map((step, i) => (
               <motion.div
                 key={step.number}
@@ -230,7 +210,7 @@ export default function FeatureCards() {
                 {/* Connector arrow */}
                 {i < steps.length - 1 && (
                   <div
-                    className="hidden lg:block absolute top-1/2 -right-3 -translate-y-1/2 z-10"
+                    className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 z-10"
                     style={{ color: 'rgba(255,193,7,0.4)', fontSize: '20px' }}
                   >
                     →

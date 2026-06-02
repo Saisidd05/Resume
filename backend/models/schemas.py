@@ -19,9 +19,19 @@ class FileType(str, Enum):
 
 class QuestionType(str, Enum):
     TEXT = "text"
+    EMAIL = "email"
+    PHONE = "phone"
+    URL = "url"
+    NUMBER = "number"
+    DECIMAL = "decimal"
+    YEAR = "year"
+    MONTH_YEAR = "month_year"
     TEXTAREA = "textarea"
-    LIST = "list"          # bullet list of items
-    MULTIFIELD = "multifield"  # e.g., company + role + dates
+    LIST = "list"
+    MULTIFIELD = "multifield"
+    TAGS = "tags"           # Chip-style tag input (e.g. skills)
+    MULTISELECT = "multiselect"  # Predefined options, pick multiple
+    LANGUAGE_BLOCK = "language_block"  # Language + proficiency pair
 
 
 class AIAction(str, Enum):
@@ -69,6 +79,10 @@ class TemplateInstruction(BaseModel):
     max_bullets: Optional[int] = None
     min_words: Optional[int] = None
     max_words: Optional[int] = None
+    min_chars: Optional[int] = None
+    max_chars: Optional[int] = None
+    min_count: Optional[int] = None        # For tags / multiselect
+    max_count: Optional[int] = None
     custom_note: Optional[str] = None      # Any free-form constraint
 
 
@@ -130,8 +144,13 @@ class QuestionField(BaseModel):
     question_type: QuestionType = QuestionType.TEXTAREA
     linked_placeholder_id: Optional[str] = None  # Links to Placeholder.id
     required: bool = True
+    is_optional: bool = False
     constraints: Optional[TemplateInstruction] = None
     ai_context: str = ""                   # Context sent to AI for this field
+    # For MULTISELECT / TAGS
+    options: Optional[list[str]] = None    # Predefined options for multiselect
+    # For REPEATABLE blocks — each field that is part of a repeatable set
+    repeatable_group: Optional[str] = None
 
 
 class QuestionCard(BaseModel):
@@ -141,6 +160,11 @@ class QuestionCard(BaseModel):
     section_order: int
     fields: list[QuestionField] = []
     description: str = ""                  # Shown above the question card
+    # Repeatable block support
+    repeatable: bool = False               # If True, user can add more instances
+    repeat_label: str = "Add Another"     # Label for the "add more" button
+    repeat_min: int = 1                    # Minimum instances required
+    repeat_max: int = 10                   # Maximum instances allowed
 
 
 class QuestionFlow(BaseModel):

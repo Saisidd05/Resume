@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Upload, Play, ArrowRight, Shield, Zap } from 'lucide-react';
+import { FileText, Play, ArrowRight, Shield, Zap } from 'lucide-react';
 
 // ── Particle system ───────────────────────────────────────────────────────────
 function ParticleCanvas() {
@@ -205,9 +205,10 @@ export default function Hero() {
             margin: '0 auto 2.5rem',
           }}
         >
-          Upload your resume template. Answer a few questions. We fill it — 
+          Answer a few questions based on our professional template.
+          We generate your resume — 
           pixel perfect, font perfect, layout perfect. 
-          <strong style={{ color: 'rgba(255,255,255,0.85)' }}> Your template. Your identity.</strong>
+          <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Download as PDF or Word in seconds.</strong>
         </motion.p>
 
         {/* CTA Buttons */}
@@ -222,25 +223,12 @@ export default function Hero() {
               whileHover={{ scale: 1.04, boxShadow: '0 12px 40px rgba(255,193,7,0.4)' }}
               whileTap={{ scale: 0.97 }}
               className="btn-primary flex items-center gap-2.5 text-base"
-              style={{ padding: '14px 32px', borderRadius: '14px', fontSize: '16px' }}
-              id="cta-upload-template"
+              style={{ padding: '14px 36px', borderRadius: '14px', fontSize: '16px' }}
+              id="cta-build-resume"
             >
-              <Upload size={18} />
-              Upload Template
+              <FileText size={18} />
+              Build My Resume — Get Started Free
               <ArrowRight size={16} />
-            </motion.button>
-          </Link>
-
-          <Link href="/builder?demo=true">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="btn-secondary flex items-center gap-2.5 text-base"
-              style={{ padding: '14px 32px', borderRadius: '14px', fontSize: '16px' }}
-              id="cta-try-demo"
-            >
-              <Play size={16} />
-              Try Demo
             </motion.button>
           </Link>
         </motion.div>

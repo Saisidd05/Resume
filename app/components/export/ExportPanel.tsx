@@ -1,289 +1,246 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, Loader2, CheckCircle, AlertCircle, FileText, RefreshCw } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  Printer,
+  FileCode,
+  Trash2
+} from 'lucide-react';
 import { useTemplateStore } from '@/store/templateStore';
-import { useBuilderStore } from '@/store/builderStore';
-import { generateAndDownload, downloadBase64File } from '@/export/exportHandler';
 
 export default function ExportPanel() {
-  const {
-    parsedTemplate,
-    answers,
-    isGenerating,
-    generatedFileB64,
-    generatedFileName,
-    generatedFileType,
-    generationErrors,
-    generationWarnings,
-  } = useTemplateStore();
+  const { answers, clearAllAnswers } = useTemplateStore();
 
-  const { strictMode } = useBuilderStore();
+  const answeredCount = Object.values(answers).filter((a) => a.value?.trim()).length;
 
-  // Store original file b64 in memory (not in Zustand/localStorage due to size)
-  const originalFileB64Ref = useRef<string | null>(null);
-  const [fileLoaded, setFileLoaded] = useState(false);
-
-  const answeredCount = Object.values(answers).filter((a) => a.value.trim()).length;
-  const totalFields =
-    parsedTemplate
-      ? parsedTemplate.sections.reduce((sum, s) => sum + s.placeholders.length, 0)
-      : 0;
-
-  // Load the original file as base64 for sending to backend
-  const loadOriginalFile = async (url: string): Promise<string> => {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve((reader.result as string).split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
-
-  const handleGenerate = async () => {
-    const { uploadedFileUrl } = useTemplateStore.getState();
-
-    let b64 = originalFileB64Ref.current;
-
-    if (!b64 && uploadedFileUrl) {
-      try {
-        b64 = await loadOriginalFile(uploadedFileUrl);
-        originalFileB64Ref.current = b64;
-        setFileLoaded(true);
-      } catch (e) {
-        console.error('Failed to load template file:', e);
-      }
-    }
-
-    if (!b64) {
-      alert('Please re-upload your template file. The original file data is not available.');
+  const handlePrint = () => {
+    const resumeEl = document.querySelector('.resume-print-target');
+    if (!resumeEl) {
+      alert('Resume content not found. Please fill in some details first.');
       return;
     }
 
-    await generateAndDownload({ strictMode, originalFileB64: b64 });
+    // Find or create the print mount root
+    let printRoot = document.getElementById('print-mount-root');
+    if (!printRoot) {
+      printRoot = document.createElement('div');
+      printRoot.id = 'print-mount-root';
+      document.body.appendChild(printRoot);
+    }
+
+    // Copy content
+    printRoot.innerHTML = resumeEl.innerHTML;
+
+    // Add printing class to body
+    document.body.classList.add('printing');
+
+    // Trigger print
+    window.print();
+
+    // Remove class and clean content after a small delay
+    setTimeout(() => {
+      document.body.classList.remove('printing');
+      if (printRoot) {
+        printRoot.innerHTML = '';
+      }
+    }, 500);
   };
 
-  const handleReDownload = () => {
-    if (generatedFileB64 && generatedFileName && generatedFileType) {
-      downloadBase64File(generatedFileB64, generatedFileName, generatedFileType);
+  const handleDownloadHTML = () => {
+    const resumeEl = document.querySelector('.resume-print-target');
+    if (!resumeEl) {
+      alert('Resume content not found. Please fill in some details first.');
+      return;
+    }
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${answers['pi_full_name']?.value || 'Resume'}</title>
+  <style>
+    body {
+      background: #f5f5f5;
+      margin: 0;
+      padding: 40px 20px;
+      font-family: "Calibri", "Arial", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .resume-container {
+      background: white;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 40px 48px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      font-size: 11px;
+      color: #1a1a1a;
+      line-height: 1.45;
+      box-sizing: border-box;
+    }
+    /* Typography */
+    h1, h2, h3, h4 {
+      margin: 0;
+    }
+    p {
+      margin: 0 0 6px 0;
+    }
+    /* Section Headings */
+    .section-heading {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid #333;
+      padding-bottom: 3px;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+    /* Tag Pills */
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .tag-pill {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: 10px;
+      color: #333;
+    }
+    /* Lists */
+    ul {
+      margin: 0 0 0 16px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 2px;
+      color: #333;
+    }
+    /* Print override */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .resume-container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+        min-height: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="resume-container">
+    ${resumeEl.innerHTML}
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${(answers['pi_full_name']?.value || 'resume').toLowerCase().replace(/\s+/g, '_')}_resume.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleReset = () => {
+    if (confirm('Are you sure you want to clear all your answers? This cannot be undone.')) {
+      clearAllAnswers();
+      // force reload to clear local state properly
+      window.location.reload();
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Status overview */}
-      <div className="glass-card rounded-2xl p-5">
+      {/* ── Section: Status / Export Actions ── */}
+      <div className="glass-card rounded-2xl p-5 space-y-4">
         <h3
           style={{
             fontFamily: 'Outfit, sans-serif',
             fontWeight: 700,
             fontSize: '1rem',
-            marginBottom: '1rem',
+            color: 'white',
           }}
         >
-          Ready to Generate?
+          Export &amp; Download Options
         </h3>
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {[
-            {
-              label: 'Template',
-              value: parsedTemplate ? '✓ Loaded' : '✗ Missing',
-              ok: !!parsedTemplate,
-            },
-            {
-              label: 'Answers',
-              value: `${answeredCount} filled`,
-              ok: answeredCount > 0,
-            },
-            {
-              label: 'Strict Mode',
-              value: strictMode ? 'ON' : 'OFF',
-              ok: true,
-              neutral: !strictMode,
-            },
-            {
-              label: 'Format',
-              value: parsedTemplate?.file_type?.toUpperCase() || '—',
-              ok: !!parsedTemplate,
-            },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="rounded-xl p-3"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-            >
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginBottom: '2px' }}>
-                {item.label}
-              </div>
-              <div
-                style={{
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                  color: item.ok ? (item.neutral ? '#FFC107' : '#4CAF50') : '#E53935',
-                }}
-              >
-                {item.value}
-              </div>
-            </div>
-          ))}
+        <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div className="flex justify-between items-center text-xs">
+            <span style={{ color: 'rgba(255,255,255,0.45)' }}>Progress Metrics</span>
+            <span className="font-bold text-yellow-400">{answeredCount} fields filled</span>
+          </div>
+          <div className="progress-bar w-full mt-2">
+            <div className="progress-fill" style={{ width: `${Math.min(100, (answeredCount / 15) * 100)}%` }} />
+          </div>
         </div>
 
-        {/* Generate button */}
+        {/* 1. Download PDF (Print) */}
+        <div className="space-y-2">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handlePrint}
+            id="download-pdf-btn"
+            className="w-full btn-primary flex items-center justify-center gap-3"
+            style={{ padding: '13px', fontSize: '14px' }}
+          >
+            <Printer size={18} />
+            Download PDF (via Print)
+          </motion.button>
+          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.72rem', lineHeight: 1.4, padding: '0 4px' }}>
+            💡 <strong>Tip:</strong> In the print popup, set Destination to <strong>Save as PDF</strong>. Under "More settings", set Margins to <strong>None</strong> and enable <strong>Background graphics</strong>.
+          </p>
+        </div>
+
+        {/* 2. Download HTML */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={handleGenerate}
-          disabled={isGenerating || !parsedTemplate || answeredCount === 0}
-          id="generate-resume-btn"
-          className="w-full btn-primary flex items-center justify-center gap-3"
-          style={{
-            padding: '14px',
-            fontSize: '15px',
-            opacity: isGenerating || !parsedTemplate || answeredCount === 0 ? 0.5 : 1,
-            cursor: isGenerating || !parsedTemplate || answeredCount === 0 ? 'not-allowed' : 'pointer',
-          }}
+          onClick={handleDownloadHTML}
+          id="download-html-btn"
+          className="w-full btn-secondary flex items-center justify-center gap-3"
+          style={{ padding: '12px', fontSize: '14px' }}
         >
-          {isGenerating ? (
-            <>
-              <Loader2 size={18} className="animate-spin" />
-              Generating Resume...
-            </>
-          ) : (
-            <>
-              <FileText size={18} />
-              Generate Resume
-            </>
-          )}
+          <FileCode size={18} />
+          Download HTML Web Page
         </motion.button>
       </div>
 
-      {/* Warnings */}
-      <AnimatePresence>
-        {generationWarnings.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="rounded-xl p-4 space-y-2"
-            style={{ background: 'rgba(255,193,7,0.08)', border: '1px solid rgba(255,193,7,0.2)' }}
-          >
-            {generationWarnings.map((w, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm" style={{ color: '#FFC107' }}>
-                <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
-                {w}
-              </div>
-            ))}
-          </motion.div>
-        )}
-
-        {generationErrors.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="rounded-xl p-4 space-y-2"
-            style={{ background: 'rgba(229,57,53,0.08)', border: '1px solid rgba(229,57,53,0.2)' }}
-          >
-            {generationErrors.map((e, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm" style={{ color: '#EF5350' }}>
-                <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
-                {e}
-              </div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Download section — shown after successful generation */}
-      <AnimatePresence>
-        {generatedFileB64 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="glass-card rounded-2xl p-5"
-            style={{ border: '1px solid rgba(76,175,80,0.25)' }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: 'rgba(76,175,80,0.15)', border: '1px solid rgba(76,175,80,0.3)' }}
-              >
-                <CheckCircle size={20} style={{ color: '#4CAF50' }} />
-              </div>
-              <div>
-                <h4 style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                  Resume Generated!
-                </h4>
-                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem' }}>
-                  {generatedFileName}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={handleReDownload}
-                id="download-resume-btn"
-                className="flex-1 btn-primary flex items-center justify-center gap-2"
-                style={{ padding: '12px' }}
-              >
-                <Download size={16} />
-                Download{' '}
-                {generatedFileType?.toUpperCase()}
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="btn-secondary flex items-center gap-2"
-                style={{ padding: '12px 20px' }}
-                title="Re-generate with current answers"
-              >
-                <RefreshCw size={15} />
-                Re-generate
-              </motion.button>
-            </div>
-
-            <p
-              className="text-center mt-3 text-xs"
-              style={{ color: 'rgba(255,255,255,0.25)' }}
-            >
-              Your template structure is preserved exactly
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Strict mode info */}
+      {/* ── Section: Clear Data ── */}
       <div
-        className="rounded-xl p-4 text-sm"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+        className="rounded-xl p-4 flex items-center justify-between"
+        style={{ background: 'rgba(229,57,53,0.04)', border: '1px solid rgba(229,57,53,0.1)' }}
       >
-        <div className="flex items-center gap-2 mb-1">
-          <div
-            className={`strict-badge ${strictMode ? 'on' : 'off'}`}
-          >
-            <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ background: strictMode ? '#E53935' : 'rgba(255,255,255,0.3)' }}
-            />
-            Strict Mode {strictMode ? 'ON' : 'OFF'}
-          </div>
+        <div>
+          <h4 style={{ fontWeight: 600, fontSize: '0.85rem', color: '#EF5350' }}>Reset Data</h4>
+          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.72rem', marginTop: '2px' }}>
+            Delete all current answers from local storage.
+          </p>
         </div>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', lineHeight: 1.5 }}>
-          {strictMode
-            ? 'Layout, fonts, spacing, and section order are locked. Only content placeholders will be replaced.'
-            : 'Strict mode is off. Template constraints may not be enforced.'}
-        </p>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleReset}
+          id="reset-answers-btn"
+          className="btn-danger"
+          style={{ padding: '8px 16px', fontSize: '12px' }}
+        >
+          <Trash2 size={13} className="inline mr-1" />
+          Reset
+        </motion.button>
       </div>
     </div>
   );

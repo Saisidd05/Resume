@@ -1,23 +1,29 @@
 'use client';
 
+/**
+ * StaticQuestionFlow — renders the 7-section hardcoded question flow.
+ * Supports repeatable sections (Experience, Education, Awards).
+ */
+
 import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, CheckCircle, Circle } from 'lucide-react';
 import { useBuilderStore } from '@/store/builderStore';
-import { useTemplateStore } from '@/store/templateStore';
-import QuestionCard from './QuestionCard';
+import { useTemplateStore, getRepeatableFieldKey } from '@/store/templateStore';
+import EnhancedQuestionCard from './EnhancedQuestionCard';
+import RepeatableSection from './RepeatableSection';
 
 export default function QuestionFlow() {
   const { currentSectionIndex, goToSection, nextSection, prevSection, nextStep } =
     useBuilderStore();
-  const { questionFlow, answers } = useTemplateStore();
+  const { questionFlow, answers, repeatCounts } = useTemplateStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   if (!questionFlow || questionFlow.cards.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-8">
         <div style={{ color: 'rgba(255,255,255,0.3)' }}>
-          No questions available. Please upload a template first.
+          Loading question form…
         </div>
       </div>
     );
@@ -27,18 +33,32 @@ export default function QuestionFlow() {
   const currentCard = questionFlow.cards[currentSectionIndex];
   const isLastSection = currentSectionIndex === totalSections - 1;
 
-  // Build answer context from previously answered fields for AI
-  const answerContext: Record<string, string> = {};
-  Object.values(answers).forEach((ans) => {
-    const key = ans.field_id.split('_').slice(2).join('_');
-    answerContext[key] = ans.value;
-  });
+  // ── Count answered fields for progress ─────────────────────────────────────
+  const countAnsweredForCard = (cardIdx: number): number => {
+    const card = questionFlow.cards[cardIdx];
+    if (!card.repeatable) {
+      return card.fields.filter((f) => answers[f.id]?.value?.trim()).length;
+    }
+    const count = repeatCounts[card.section_id] ?? 1;
+    let answered = 0;
+    for (let i = 0; i < count; i++) {
+      card.fields.forEach((f) => {
+        const key = getRepeatableFieldKey(card.section_id, i, f.id);
+        if (answers[key]?.value?.trim()) answered++;
+      });
+    }
+    return answered;
+  };
 
-  // Count answered fields in current card
-  const answeredCount = currentCard.fields.filter(
-    (f) => answers[f.id]?.value?.trim()
-  ).length;
-  const totalFields = currentCard.fields.length;
+  const totalFieldsForCard = (cardIdx: number): number => {
+    const card = questionFlow.cards[cardIdx];
+    if (!card.repeatable) return card.fields.filter((f) => f.required).length;
+    const count = repeatCounts[card.section_id] ?? 1;
+    return count * card.fields.filter((f) => f.required).length;
+  };
+
+  const answeredCount = countAnsweredForCard(currentSectionIndex);
+  const totalRequired = totalFieldsForCard(currentSectionIndex);
 
   const scrollToTop = () => {
     containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -46,11 +66,8 @@ export default function QuestionFlow() {
 
   const handleNext = () => {
     scrollToTop();
-    if (isLastSection) {
-      nextStep(); // Go to preview/export step
-    } else {
-      nextSection();
-    }
+    if (isLastSection) nextStep();
+    else nextSection();
   };
 
   const handlePrev = () => {
@@ -58,29 +75,37 @@ export default function QuestionFlow() {
     prevSection();
   };
 
+  // Section icon / emoji mapping
+  const SECTION_ICONS: Record<string, string> = {
+    personal_info: '👤',
+    executive_summary: '📝',
+    technical_skills: '⚙️',
+    soft_skills: '💬',
+    experience: '💼',
+    projects: '🚀',
+    education: '🎓',
+    awards: '🏆',
+  };
+
   return (
     <div className="flex flex-col h-full">
-      {/* Section tabs */}
+      {/* Section tab bar */}
       <div
         className="flex gap-2 overflow-x-auto pb-3 px-1"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {questionFlow.cards.map((card, idx) => {
-          const cardAnswered = card.fields.filter(
-            (f) => answers[f.id]?.value?.trim()
-          ).length;
           const isActive = idx === currentSectionIndex;
-          const isComplete = cardAnswered === card.fields.length && card.fields.length > 0;
+          const answered = countAnsweredForCard(idx);
+          const required = totalFieldsForCard(idx);
+          const isComplete = required > 0 && answered >= required;
 
           return (
             <button
               key={card.section_id}
               onClick={() => { goToSection(idx); scrollToTop(); }}
               id={`section-tab-${idx}`}
-              className="flex items-center gap-2 flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              className="flex items-center gap-1.5 flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
               style={{
                 background: isActive
                   ? 'rgba(255,193,7,0.15)'
@@ -94,7 +119,7 @@ export default function QuestionFlow() {
               ) : (
                 <Circle size={11} />
               )}
-              {card.section_name}
+              <span>{SECTION_ICONS[card.section_id] || ''} {card.section_name}</span>
             </button>
           );
         })}
@@ -115,25 +140,29 @@ export default function QuestionFlow() {
             style={{
               fontFamily: 'Outfit, sans-serif',
               fontWeight: 700,
-              fontSize: '1.15rem',
+              fontSize: '1.1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
             }}
           >
+            <span style={{ fontSize: '1.3rem' }}>{SECTION_ICONS[currentCard.section_id] || ''}</span>
             {currentCard.section_name}
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginTop: '2px' }}>
-            Section {currentSectionIndex + 1} of {totalSections} ·{' '}
-            {answeredCount}/{totalFields} fields answered
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', marginTop: '2px' }}>
+            Section {currentSectionIndex + 1} of {totalSections}
+            {totalRequired > 0 && ` · ${answeredCount}/${totalRequired} required fields`}
           </p>
         </div>
         <div
           className="text-right text-xs font-bold gradient-text"
-          style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.5rem' }}
+          style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.4rem' }}
         >
           {Math.round(((currentSectionIndex + 1) / totalSections) * 100)}%
         </div>
       </div>
 
-      {/* Template instruction note for section */}
+      {/* Section description */}
       {currentCard.description && (
         <div
           className="mb-4 px-4 py-3 rounded-xl text-sm"
@@ -157,21 +186,27 @@ export default function QuestionFlow() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
           >
-            {currentCard.fields.map((field) => (
-              <QuestionCard
-                key={field.id}
-                field={field}
-                sectionId={currentCard.section_id}
-                sectionName={currentCard.section_name}
-                context={answerContext}
-              />
-            ))}
+            {currentCard.repeatable ? (
+              <RepeatableSection card={currentCard} />
+            ) : (
+              currentCard.fields.map((field) => (
+                <EnhancedQuestionCard
+                  key={field.id}
+                  field={field}
+                  sectionId={currentCard.section_id}
+                  fieldKey={field.id}
+                />
+              ))
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Navigation footer */}
-      <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <div
+        className="flex items-center justify-between mt-4 pt-4"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+      >
         <button
           onClick={handlePrev}
           disabled={currentSectionIndex === 0}

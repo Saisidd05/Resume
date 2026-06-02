@@ -1,3 +1,5 @@
+'use client';
+
 import Navbar from '@/components/landing/Navbar';
 import Hero from '@/components/landing/Hero';
 import FeatureCards from '@/components/landing/FeatureCards';
@@ -20,7 +22,7 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px' }}>
-            © 2024 At Your Hand · MIT License · Open Source
+            © 2026 At Your Hand · MIT License · Open Source · Build Using AI
           </div>
           <div className="flex items-center gap-6" style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px' }}>
             <a href="https://github.com" target="_blank" rel="noopener noreferrer"

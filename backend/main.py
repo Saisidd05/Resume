@@ -10,7 +10,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import parse, generate, ai
+from backend.routers import parse, generate, ai, default_template
 
 # ── Logging setup ─────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -38,6 +38,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:5743",
+        "http://127.0.0.1:5743",
         "http://localhost:3001",
     ],
     allow_credentials=True,
@@ -49,6 +51,7 @@ app.add_middleware(
 app.include_router(parse.router)
 app.include_router(generate.router)
 app.include_router(ai.router)
+app.include_router(default_template.router)
 
 
 # ── Health check ──────────────────────────────────────────────────────────────

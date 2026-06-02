@@ -36,10 +36,10 @@ interface BuilderState {
   resetBuilder: () => void;
 }
 
-const STEPS: BuilderStep[] = ['upload', 'questions', 'preview', 'export'];
+const STEPS: BuilderStep[] = ['questions', 'preview', 'export'];
 
 export const useBuilderStore = create<BuilderState>((set, get) => ({
-  currentStep: 'upload',
+  currentStep: 'questions' as BuilderStep,
   currentSectionIndex: 0,
   strictMode: true,          // Default ON — enforce TEMPLATE IN = TEMPLATE OUT
   strictModeWarningShown: false,
@@ -93,7 +93,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
 
   resetBuilder: () =>
     set({
-      currentStep: 'upload',
+      currentStep: 'questions',
       currentSectionIndex: 0,
       strictModeWarningShown: false,
     }),
