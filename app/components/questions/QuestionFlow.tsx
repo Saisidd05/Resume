@@ -19,6 +19,42 @@ export default function QuestionFlow() {
   const { questionFlow, answers, repeatCounts } = useTemplateStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Calculate overall form completion progress (starts at 0% and increases as they type)
+  const getOverallProgress = (): number => {
+    let totalRequired = 0;
+    let totalFilledRequired = 0;
+
+    questionFlow.cards.forEach((card) => {
+      const isRepeatable = card.repeatable;
+      const count = isRepeatable ? (repeatCounts[card.section_id] ?? (card.repeat_min || 0)) : 1;
+      const requiredFields = card.fields.filter((f) => f.required);
+
+      if (isRepeatable) {
+        for (let i = 0; i < count; i++) {
+          requiredFields.forEach((f) => {
+            totalRequired++;
+            const key = getRepeatableFieldKey(card.section_id, i, f.id);
+            if (answers[key]?.value?.trim()) {
+              totalFilledRequired++;
+            }
+          });
+        }
+      } else {
+        requiredFields.forEach((f) => {
+          totalRequired++;
+          if (answers[f.id]?.value?.trim()) {
+            totalFilledRequired++;
+          }
+        });
+      }
+    });
+
+    if (totalRequired === 0) return 0;
+    return Math.round((totalFilledRequired / totalRequired) * 100);
+  };
+
+  const overallProgress = getOverallProgress();
+
   if (!questionFlow || questionFlow.cards.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-8">
@@ -129,7 +165,7 @@ export default function QuestionFlow() {
       <div className="progress-bar my-3">
         <div
           className="progress-fill"
-          style={{ width: `${((currentSectionIndex + 1) / totalSections) * 100}%` }}
+          style={{ width: `${overallProgress}%` }}
         />
       </div>
 
@@ -158,7 +194,7 @@ export default function QuestionFlow() {
           className="text-right text-xs font-bold gradient-text"
           style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.4rem' }}
         >
-          {Math.round(((currentSectionIndex + 1) / totalSections) * 100)}%
+          {overallProgress}%
         </div>
       </div>
 
