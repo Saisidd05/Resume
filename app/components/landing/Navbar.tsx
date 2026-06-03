@@ -40,8 +40,8 @@ export default function Navbar() {
         {/* Center: Nav Links */}
         <div className="hidden md:flex items-center justify-center gap-8 flex-1">
           {[
-            { label: 'Features', href: '#features' },
-            { label: 'How It Works', href: '#how-it-works' },
+            { label: 'Features', href: '/#features' },
+            { label: 'How It Works', href: '/#how-it-works' },
           ].map((link) => (
             <a
               key={link.label}

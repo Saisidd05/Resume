@@ -37,6 +37,12 @@ export default function LandingPage() {
               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}>
               Start Building
             </Link>
+            <Link href="/contact"
+              style={{ transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#FFC107')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}>
+              Contact Us
+            </Link>
           </div>
         </div>
       </footer>
