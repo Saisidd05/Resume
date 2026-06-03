@@ -7,6 +7,21 @@ import { FileText, Phone, Mail, Send, ChevronLeft, Copy, Check } from 'lucide-re
 import toast from 'react-hot-toast';
 import Navbar from '@/components/landing/Navbar';
 
+// WhatsApp SVG Icon
+function WhatsAppIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="currentColor"
+      className={className}
+    >
+      <path d="M12.004 0C5.378 0 .004 5.374.004 12c0 2.112.551 4.17 1.596 5.979L.004 24l6.166-1.617A11.956 11.956 0 0012.004 24c6.626 0 12-5.374 12-12s-5.374-12-12-12zm6.757 16.942c-.276.776-1.398 1.411-2.228 1.583-.564.118-1.3.21-3.79-.817-3.184-1.31-5.239-4.552-5.398-4.763-.16-.21-1.282-1.706-1.282-3.255 0-1.549.81-2.31 1.099-2.613.29-.303.626-.379.835-.379.208 0 .416.002.597.01.189.008.444-.072.694.53.256.619.876 2.137.95 2.293.076.156.126.338.02.548-.106.21-.16.338-.318.528-.158.19-.333.424-.476.57-.16.163-.327.34-.14.658.188.318.835 1.378 1.79 2.227.955.849 1.76 1.112 2.062 1.238.303.126.48.106.66-.1.18-.205.776-.902.983-1.213.208-.312.416-.26.702-.153.287.106 1.823.859 2.137 1.016.315.156.524.234.6.363.076.13.076.753-.2 1.529z" />
+    </svg>
+  );
+}
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,13 +134,25 @@ export default function ContactPage() {
                         </a>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleCopy(contactInfo.phone, 'Phone')}
-                      className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.05)] text-gray-400 hover:text-white"
-                      title="Copy phone number"
-                    >
-                      {copiedField === 'Phone' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* WhatsApp */}
+                      <a
+                        href={`https://wa.me/91${contactInfo.phone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(76,175,80,0.12)] text-gray-400 hover:text-[#4CAF50] flex items-center justify-center"
+                        title="Chat on WhatsApp"
+                      >
+                        <WhatsAppIcon size={16} />
+                      </a>
+                      <button
+                        onClick={() => handleCopy(contactInfo.phone, 'Phone')}
+                        className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.05)] text-gray-400 hover:text-white"
+                        title="Copy phone number"
+                      >
+                        {copiedField === 'Phone' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Email */}
