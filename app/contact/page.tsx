@@ -168,13 +168,23 @@ export default function ContactPage() {
                         </a>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleCopy(contactInfo.email, 'Email')}
-                      className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.05)] text-gray-400 hover:text-white"
-                      title="Copy email address"
-                    >
-                      {copiedField === 'Email' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Send Email */}
+                      <a
+                        href={`mailto:${contactInfo.email}`}
+                        className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(229,57,53,0.12)] text-gray-400 hover:text-[#E53935] flex items-center justify-center"
+                        title="Send Email"
+                      >
+                        <Mail size={15} />
+                      </a>
+                      <button
+                        onClick={() => handleCopy(contactInfo.email, 'Email')}
+                        className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.05)] text-gray-400 hover:text-white"
+                        title="Copy email address"
+                      >
+                        {copiedField === 'Email' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
