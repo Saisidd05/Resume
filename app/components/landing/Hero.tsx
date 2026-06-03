@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { FileText, Play, ArrowRight, Shield, Zap } from 'lucide-react';
 
 // ── Particle system ───────────────────────────────────────────────────────────
-function ParticleCanvas() {
+export function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

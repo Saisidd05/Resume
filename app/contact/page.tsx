@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { FileText, Phone, Mail, Send, ChevronLeft, Copy, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '@/components/landing/Navbar';
+import { ParticleCanvas } from '@/components/landing/Hero';
 
 // WhatsApp SVG Icon
 function WhatsAppIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
@@ -78,11 +79,30 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0A0A0A', color: '#FFFFFF' }}>
+    <div className="hero-bg min-h-screen flex flex-col relative overflow-hidden" style={{ color: '#FFFFFF' }}>
       <Navbar />
 
+      {/* Particle Canvas */}
+      <ParticleCanvas />
+
+      {/* Glow orbs */}
+      <div
+        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(255,193,7,0.06) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+        }}
+      />
+      <div
+        className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(229,57,53,0.05) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+        }}
+      />
+
       {/* Main Content */}
-      <main className="flex-grow pt-28 pb-16 px-6">
+      <main className="flex-grow pt-28 pb-16 px-6 relative z-10">
         <div className="max-w-5xl mx-auto">
           {/* Back button */}
           <Link href="/" className="inline-flex items-center gap-2 text-sm mb-8 transition-colors" style={{ color: 'rgba(255,255,255,0.45)' }} onMouseEnter={e => e.currentTarget.style.color = '#FFC107'} onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}>
@@ -355,7 +375,7 @@ export default function ContactPage() {
       </main>
 
       {/* Simple Footer */}
-      <footer className="py-6 px-6 text-center border-t border-[rgba(255,255,255,0.06)]">
+      <footer className="py-6 px-6 text-center border-t border-[rgba(255,255,255,0.06)] relative z-10">
         <div className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
           © 2026 At Your Hand · Designed & Built by {contactInfo.name}
         </div>
