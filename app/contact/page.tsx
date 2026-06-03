@@ -48,12 +48,33 @@ export default function ContactPage() {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setIsSubmitting(false);
 
-    toast.success('Thank you! Your message has been sent successfully.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${contactInfo.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          Name: formData.name,
+          Email: formData.email,
+          Subject: formData.subject || 'At Your Hand - New Contact Message',
+          Message: formData.message,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Thank you! Your message has been sent successfully.');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        toast.error('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      toast.error('Something went wrong. Please check your network connection.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
