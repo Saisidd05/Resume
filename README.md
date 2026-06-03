@@ -1,8 +1,8 @@
-# At Your Hand — Template-Preserving Resume Builder
+# At Your Hand — Structure-Preserving Resume Builder
 
-> **TEMPLATE IN = TEMPLATE OUT**
+> **ANSWER QUESTIONS = GET A PERFECT RESUME**
 
-Upload any PDF or DOCX resume template. Answer targeted questions. Get back the *exact same template* — pixel-perfect, with your content filled in. No redesign. No layout changes. Your template is sacred.
+Answer targeted questions based on standard professional resume layouts. Watch your resume render in real time on a beautifully structured template. Download as a standalone HTML file or print/save as a clean vector PDF instantly.
 
 **Live Demo:** [https://resume-kohl-chi-77.vercel.app/](https://resume-kohl-chi-77.vercel.app/)
 
@@ -10,16 +10,13 @@ Upload any PDF or DOCX resume template. Answer targeted questions. Get back the 
 
 ## ✨ Features
 
-- **Upload PDF or DOCX** resume templates
-- **Template Intelligence Engine** — reads written instructions (`"3–4 lines"`, `"5 bullet points"`) and enforces them
-- **Dynamic Question Generator** — questions derived from YOUR template's actual sections
-- **AI Content Assist** — Generate, Improve, Shorten, Professional Tone (optional)
-- **Live Preview** — real-time PDF preview as you answer questions
-- **Strict Template Mode** — locks layout, fonts, colors (default ON)
-- **Pixel-perfect PDF output** — visually identical to your uploaded template
-- **PDF & DOCX export**
-- **Fully local-first** — no login, no database, no tracking
-- **Open source** (MIT)
+- **Guided Questions** — Fill in your details step-by-step across 8 comprehensive sections designed for maximum visual alignment.
+- **Smart Repeaters** — Dynamically add and manage repeatable blocks for Professional Experience, Projects, Education, and Awards.
+- **Live Preview** — Watch your resume render in real time on a beautifully structured, standard Calibri/Arial template card.
+- **Print Directly to PDF** — Instantly print or save your resume as a clean, high-resolution vector PDF using standard browser print options.
+- **Export Standalone HTML** — Download a single, fully responsive HTML file with nested styles to host online or run locally.
+- **AI Content Assist (Optional)** — Generate, Improve, Shorten, or set a Professional Tone.
+- **100% Offline & Private** — No database, no accounts, and no data tracking. Your resume details stay locally in your browser storage.
 
 ---
 
@@ -34,8 +31,8 @@ Upload any PDF or DOCX resume template. Answer targeted questions. Get back the 
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/at-your-hand.git
-cd at-your-hand
+git clone https://github.com/Saisidd05/Resume.git
+cd Resume
 ```
 
 ### 2. Install frontend dependencies
@@ -44,7 +41,7 @@ cd at-your-hand
 npm install
 ```
 
-### 3. Install backend dependencies
+### 3. Install backend dependencies (Optional, required for AI features)
 
 ```bash
 pip install -r requirements.txt
@@ -57,7 +54,7 @@ cp .env.example .env.local
 # Edit .env.local to add your AI API key (optional)
 ```
 
-### 5. Start the backend
+### 5. Start the backend (Optional, required for AI features)
 
 ```bash
 python -m uvicorn backend.main:app --reload --port 8000
@@ -69,7 +66,7 @@ python -m uvicorn backend.main:app --reload --port 8000
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to use the app.
+Open [http://localhost:3000](http://localhost:3000) (or the port specified by Next.js) to use the app.
 
 ---
 
@@ -78,11 +75,8 @@ Open [http://localhost:3000](http://localhost:3000) to use the app.
 | Layer | Technology |
 |---|---|
 | Frontend | Next.js 14, TypeScript, Tailwind CSS, Framer Motion |
-| Backend | FastAPI, Python |
-| PDF Processing | PyMuPDF (fitz) |
-| DOCX Processing | python-docx |
 | State | Zustand + localStorage |
-| AI (optional) | OpenAI / Anthropic |
+| AI (optional) | FastAPI, Python, OpenAI / Anthropic |
 
 ---
 
@@ -92,7 +86,6 @@ Open [http://localhost:3000](http://localhost:3000) to use the app.
 /app
   /components
     /landing       # Hero, Navbar, FeatureCards
-    /upload        # UploadZone
     /questions     # QuestionFlow, QuestionCard, AnswerToolbar
     /preview       # LivePreview, TemplateRenderer
     /export        # ExportPanel
@@ -129,14 +122,11 @@ To enable AI:
 
 ---
 
-## 📋 How the Template Engine Works
+## 📋 How It Works
 
-1. **Parse**: Upload PDF/DOCX → extract sections, headings, fonts, bounding boxes
-2. **Detect Instructions**: Find text like `"3–4 lines"` → create constraints
-3. **Generate Questions**: Map sections to targeted question sets
-4. **Validate Answers**: Real-time constraint checking in the UI
-5. **Generate Output**: Fill original template with answers at exact positions
-6. **Export**: Download pixel-perfect PDF or DOCX
+1. **Answer Questions**: Fill in 8 comprehensive sections with optional repeatable blocks.
+2. **Live Preview**: Watch your layout and contents update in real time as you type.
+3. **Print & Export**: Print/save directly as a clean PDF or download the standalone responsive HTML file.
 
 ---
 
