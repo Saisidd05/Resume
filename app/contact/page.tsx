@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FileText, Phone, Mail, Send, ChevronLeft, Copy, Check } from 'lucide-react';
+import { FileText, Phone, Mail, Send, ChevronLeft, Copy, Check, Linkedin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '@/components/landing/Navbar';
 import { ParticleCanvas } from '@/components/landing/Hero';
@@ -32,6 +32,7 @@ export default function ContactPage() {
     name: 'Sai Siddharth N',
     phone: '9345411184',
     email: 'nsaisiddharth05@gmail.com',
+    linkedin: 'https://www.linkedin.com/in/sai-siddharth-nanda-gopal-b96883321',
   };
 
   const handleCopy = (text: string, type: string) => {
@@ -224,6 +225,46 @@ export default function ContactPage() {
                         title="Copy email address"
                       >
                         {copiedField === 'Email' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* LinkedIn */}
+                  <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center bg-[rgba(10,102,194,0.15)] text-[#0A66C2]">
+                        <Linkedin size={15} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>LinkedIn</div>
+                        <a
+                          href={contactInfo.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-semibold transition-colors hover:text-[#0A66C2] block truncate"
+                          style={{ maxWidth: '170px' }}
+                        >
+                          sai-siddharth-nanda-gopal-b96883321
+                        </a>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Visit Profile */}
+                      <a
+                        href={contactInfo.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(10,102,194,0.12)] text-gray-400 hover:text-[#0A66C2] flex items-center justify-center"
+                        title="Visit LinkedIn"
+                      >
+                        <Linkedin size={15} />
+                      </a>
+                      <button
+                        onClick={() => handleCopy(contactInfo.linkedin, 'LinkedIn')}
+                        className="p-1.5 rounded-lg transition-colors hover:bg-[rgba(255,255,255,0.05)] text-gray-400 hover:text-white"
+                        title="Copy LinkedIn URL"
+                      >
+                        {copiedField === 'LinkedIn' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
